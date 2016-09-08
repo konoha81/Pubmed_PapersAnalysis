@@ -10,17 +10,23 @@ import json, requests, csv
 """
 説明！！！
 
-出力形式 csv
-論文タイトル, PMID, 年, 月, キーワード
-をそれぞれ取得する。
+論文タイトル, PMID, 年, 月, キーワード（ ";" 区切り）
+をそれぞれ取得して csv形式で出力。
 
-キーワードは ";" で区切られる。
+eSearch API を利用
+http://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESearch
+
+
+【参考】
+Hacking on the Pubmed API
+http://www.fredtrotter.com/2014/11/14/hacking-on-the-pubmed-api/
+
 
 """
 
 
 def fetch_PMID():
-	""" eSearch API を利用してJSONから対象termを含む論文のPMIDを取得する """
+	""" JSONから対象termを含む論文のPMIDを取得する """
 
 	term = "JAMIA[TA]"
 	retmax = "1000"
@@ -60,19 +66,24 @@ def fetch_data(PMID):
 
 	# 論文のキーワードを追加
 	keyword_list = []
-	if root.find('.//Keyword') is not None: # keywordsがない場合は"NaN"をリストに代入する
+	if root.find('.//Keyword') is not None: 
 		for keywords in root.iter('Keyword'):
 			keyword_list.append(keywords.text)
 	else:
-		keyword_list.append("NaN")
+		keyword_list.append("NaN") # keywordsがない場合は"NaN"をリストに代入する
 
-	data_list.append('; '.join(keyword_list))
+	data_list.append('; '.join(keyword_list)) # keywordsリストを ";" 区切りにしてリストへ追加
 
 	return data_list
 
 
 
 if __name__ == '__main__':
+
+
+	#print("")
+	#query = input()
+
 
 	PMID_list, retmax = fetch_PMID()
 
