@@ -80,11 +80,6 @@ def fetch_data(PMID):
 
 if __name__ == '__main__':
 
-
-	#print("")
-	#query = input()
-
-
 	PMID_list, retmax = fetch_PMID()
 
 	pbar = tqdm(total=int(retmax)) # 進捗を表示する
