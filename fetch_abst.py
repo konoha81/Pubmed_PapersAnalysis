@@ -10,12 +10,14 @@ import json, requests, csv
 """
 説明！！！
 
-論文タイトル, PMID, 年, 月, キーワード（ ";" 区切り）
+論文タイトル, PMID, 年, 月, キーワード（ ";" 区切り）, アブストラクト
 をそれぞれ取得して csv形式で出力。
 
 eSearch API を利用
 http://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESearch
 
+取得枚数の指定（retmax）は最大10万件まで可能。
+それ以上の取得や、途中で切断された場合には、retstartに再開する値をセットする。
 
 【参考】
 Hacking on the Pubmed API
@@ -25,19 +27,16 @@ http://www.fredtrotter.com/2014/11/14/hacking-on-the-pubmed-api/
 """
 
 
-def fetch_PMID():
+def fetch_PMID(term, retmax, retstart):
 	""" JSONから対象termを含む論文のPMIDを取得する """
 
-	term = "JAMIA[TA]"
-	retmax = "1000"
-
 	url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed"\
-	"&term={term}&retmode=json&retmax={retmax}".format(term=term, retmax=retmax)
+	"&term={term}&retmode=json&retmax={retmax}&retstart={retstart}".format(term=term, retmax=retmax, retstart=retstart)
 	jsonString = requests.get(url).text
 	data = json.loads(jsonString)
 	PMID_list = data['esearchresult']['idlist']
 
-	return PMID_list, retmax
+	return PMID_list
 
 
 def fetch_data(PMID):
@@ -74,29 +73,49 @@ def fetch_data(PMID):
 
 	data_list.append('; '.join(keyword_list)) # keywordsリストを ";" 区切りにしてリストへ追加
 
+
+	# 論文のアブストラクトを追加
+	abstract_list = []
+	if root.find('.//AbstractText') is not None: 
+		for abst in root.iter('AbstractText'):
+				abstract_list.append(abst.text)
+	else:
+		abstract_list.append("NaN") # abstractがない場合は"NaN"をリストに代入する
+
+
+	data_list.append(''.join(abstract_list))
+
 	return data_list
 
 
 
 if __name__ == '__main__':
 
-	PMID_list, retmax = fetch_PMID()
+	term = "JAMIA[TA]"
+	retmax = 1720
+	retstart = 0
 
-	pbar = tqdm(total=int(retmax)) # 進捗を表示する
+	PMID_list = fetch_PMID(term, retmax, retstart)
 
-	with open('JAMIA_data.csv', 'a') as f: # ヘッダーを書き込む
+	pbar = tqdm(total=retmax-retstart) # 進捗を表示する
+
+
+	
+	with open('JAMIA_data4.csv', 'a') as f: # ヘッダーを書き込む
 		writer = csv.writer(f, lineterminator='\n')
-		writer.writerow(["Title", "PMID", "Year", "Month", "Keywords"])
+		writer.writerow(["Title", "PMID", "Year", "Month", "Keywords", "Abstract"])
 
 	for i,j in enumerate(PMID_list):
 		data_list = fetch_data(j)
 				
-		with open('JAMIA_data.csv', 'a') as f:
+		with open('JAMIA_data4.csv', 'a') as f:
 			writer = csv.writer(f, lineterminator='\n')
 			writer.writerow(data_list)
 
 		pbar.update(1)
 		sleep(0.1)
+
 	pbar.close()
+
 	print("Finish!")
 
