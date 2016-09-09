@@ -8,7 +8,7 @@ import json, requests, csv
 
 
 """
-説明！！！
+説明！！！！
 
 論文タイトル, PMID, 年, 月, キーワード（ ";" 区切り）, アブストラクト
 をそれぞれ取得して csv形式で出力。
@@ -18,6 +18,7 @@ http://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESearch
 
 取得枚数の指定（retmax）は最大10万件まで可能。
 それ以上の取得や、途中で切断された場合には、retstartに再開する値をセットする。
+
 
 【参考】
 Hacking on the Pubmed API
@@ -40,7 +41,7 @@ def fetch_PMID(term, retmax, retstart):
 
 
 def fetch_data(PMID):
-	""" 指定PMIDの情報をXMLから抽出してリストに入れる  """
+	""" 指定PMIDの論文情報をXMLから抽出する  """
 
 	# リストを初期化
 	data_list = []
