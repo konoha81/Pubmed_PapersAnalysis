@@ -97,11 +97,11 @@ if __name__ == '__main__':
 
 	PMID_list = fetch_PMID(term, retmax, retstart)
 
-	pbar = tqdm(total=retmax-retstart) # 進捗を表示する
+	# 進捗を表示する
+	pbar = tqdm(total=retmax-retstart) 
 
-
-	
-	with open('JAMIA_data4.csv', 'a') as f: # ヘッダーを書き込む
+	# ヘッダーを書き込む
+	with open('JAMIA_data4.csv', 'a') as f: 
 		writer = csv.writer(f, lineterminator='\n')
 		writer.writerow(["Title", "PMID", "Year", "Month", "Keywords", "Abstract"])
 
