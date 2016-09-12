@@ -1,10 +1,4 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*- 
-
-from tqdm import tqdm
-from time import sleep
-import xml.etree.ElementTree as ET
-import json, requests, csv
 
 
 """
@@ -26,6 +20,14 @@ http://www.fredtrotter.com/2014/11/14/hacking-on-the-pubmed-api/
 
 
 """
+
+#!/usr/bin/env python
+
+from tqdm import tqdm
+from time import sleep
+import xml.etree.ElementTree as ET
+import json, requests, csv, codecs
+
 
 
 def fetch_PMID(term, retmax, retstart):
@@ -93,28 +95,41 @@ def fetch_data(PMID):
 if __name__ == '__main__':
 
 	term = "JAMIA[TA]"
-	retmax = 1720
-	retstart = 0
+	retmax = 1000
+	retstart = 500
+
+	filename= 'JAMIA_data6.csv'
 
 	PMID_list = fetch_PMID(term, retmax, retstart)
 
 	# 進捗を表示する
 	pbar = tqdm(total=retmax-retstart) 
 
+	"""
 	# ヘッダーを書き込む
-	with open('JAMIA_data4.csv', 'a') as f: 
+	with open(filename, 'w') as f: 
 		writer = csv.writer(f, lineterminator='\n')
 		writer.writerow(["Title", "PMID", "Year", "Month", "Keywords", "Abstract"])
+	"""
 
 	for i,j in enumerate(PMID_list):
 		data_list = fetch_data(j)
-				
-		with open('JAMIA_data4.csv', 'a') as f:
+		
+		with open(filename, 'w') as f:
 			writer = csv.writer(f, lineterminator='\n')
 			writer.writerow(data_list)
 
 		pbar.update(1)
 		sleep(0.1)
+
+	
+	fin = codecs.open(filename, "r")
+	fout_utf = codecs.open("test2.csv", "a", "utf-8")
+	for row in fin:
+		fout_utf.write(row)
+	fin.close()
+	fout_utf.close()
+	
 
 	pbar.close()
 
