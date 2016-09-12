@@ -95,22 +95,22 @@ def fetch_data(PMID):
 if __name__ == '__main__':
 
 	term = "JAMIA[TA]"
-	retmax = 1000
-	retstart = 500
+	retmax = 50
+	retstart = 0
 
-	filename= 'JAMIA_data6.csv'
+	filename= 'JAMIA_data_test.csv'
 
 	PMID_list = fetch_PMID(term, retmax, retstart)
 
 	# 進捗を表示する
 	pbar = tqdm(total=retmax-retstart) 
 
-	"""
+
 	# ヘッダーを書き込む
 	with open(filename, 'w') as f: 
 		writer = csv.writer(f, lineterminator='\n')
 		writer.writerow(["Title", "PMID", "Year", "Month", "Keywords", "Abstract"])
-	"""
+
 
 	for i,j in enumerate(PMID_list):
 		data_list = fetch_data(j)
